@@ -11,6 +11,7 @@ body {
   justify-content: center; /* Alinha horizontalmente no centro */
   align-items: center;     /* Alinha verticalmente no centro */
   height: 100vh;           /* Usa 100% da altura da viewport */
+  position: relative;
 }
 
 #map {
@@ -18,4 +19,72 @@ body {
   border: 5px solid pink; 
   width: 850px;
   height: 450px;
+  margin-top: 25px;
+}
+
+.controls {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background: white;
+  padding: 10px;
+  border-radius: 5px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+  margin-bottom: 5px;
+  margin-top: 5px;
+}
+
+#coordinates {
+  position: absolute;
+  top: 50px;
+  left: 10px;
+  background: white;
+  padding: 5px;
+  border-radius: 5px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+  margin-top: 15px;
+}
+
+.search-bar {
+  position: absolute;
+  top: 70px; /* Ajuste a posição conforme necessário */
+  left: 10px;
+  background: white;
+  padding: 5px;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;margin-top: 35px;
+}
+
+#search {
+  border: 2px solid pink;
+  border-radius: 20px; /* Arredonda os cantos do campo de pesquisa */
+  padding: 5px 10px;
+  font-size: 14px;
+  outline: none;
+  box-sizing: border-box; /* Garante que o padding não afete o tamanho total */
+  margin-right: 10px; /* Espaço entre o campo de pesquisa e o botão */
+  color: #333; /* Cor do texto dentro do campo de pesquisa */
+}
+
+#search::placeholder {
+  color: pink; /* Cor do texto do placeholder */
+}
+
+#search:focus {
+  border-color: #ff69b4; /* Borda rosa ao focar no campo */
+}
+
+.search-button {
+  background-color: pink;
+  border: none;
+  color: white;
+  border-radius: 20px;
+  padding: 5px 10px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.search-button:hover {
+  background-color: #ff69b4; /* Cor de fundo mais escura ao passar o mouse */
 }

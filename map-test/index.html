@@ -5,18 +5,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Map with Controls</title>
   <link rel="stylesheet" href="style.css" />
+  <!-- Link para a fonte Roboto Condensed -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@400;700&display=swap">
 </head>
-<body>
-  <div class="container">
-    <div id="map"></div>
-  </div>
-
+<body> 
   <!-- Barra de pesquisa e botão -->
   <div class="search-bar">
     <input id="search" type="text" placeholder="Pesquise" />
-    <!--<button id="search-btn" class="search-button">Pesquisar</button>-->
+    <div id="coordinates">Latitude: -23.55050, Longitude: -46.63330</div>
   </div>
-
+  
   <!-- Controles deslizantes para latitude e longitude -->
   <div class="controls">
     <label for="lat-range">Latitude:</label>
@@ -28,7 +26,13 @@
     <span id="lon-value">-46.6333</span>
   </div>
 
-  <div id="coordinates">Latitude: -23.55050, Longitude: -46.63330</div>
+  <div class="container">
+    <div class="sugestao">
+      <!-- Botão de salvar -->
+      <button id="save-btn" class="save-button">Salvar Localização</button>
+    </div>
+    <div id="map"></div>
+  </div>
 
   <script type="module" src="./main.js"></script>
 </body>

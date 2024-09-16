@@ -5,7 +5,7 @@ import OSM from 'ol/source/OSM.js';
 import View from 'ol/View.js';
 import VectorLayer from 'ol/layer/Vector.js';
 import VectorSource from 'ol/source/Vector.js';
-import { Style, Fill, Stroke } from 'ol/style.js';
+import { Style, Icon } from 'ol/style.js';
 import Feature from 'ol/Feature.js';
 import Point from 'ol/geom/Point.js';
 import { fromLonLat, toLonLat } from 'ol/proj.js';
@@ -17,15 +17,6 @@ const vectorSource = new VectorSource();
 
 const vectorLayer = new VectorLayer({
   source: vectorSource,
-  style: new Style({
-    fill: new Fill({
-      color: 'rgba(233, 189, 192, 0.5)', // Cor rosa com opacidade
-    }),
-    stroke: new Stroke({
-      color: '#ff69b4', // Cor da borda rosa
-      width: 2,
-    }),
-  }),
 });
 
 const map = new Map({
@@ -43,12 +34,38 @@ const map = new Map({
   }),
 });
 
-// Atualiza as coordenadas no elemento HTML conforme o mouse se move
-map.on('pointermove', function(event) {
+let lastClickedCoordinate = null; // Variável para armazenar a última coordenada clicada
+
+// Função para adicionar o ícone no local do clique
+function addMarker(coordinate) {
+  const marker = new Feature({
+    geometry: new Point(coordinate),
+  });
+
+  marker.setStyle(new Style({
+    image: new Icon({
+      anchor: [0.5, 1],
+      src: 'https://cdn-icons-png.flaticon.com/512/684/684908.png', // Ícone padrão para o marcador
+      scale: 0.05, // Ajusta o tamanho do ícone
+    }),
+  }));
+
+  vectorSource.clear(); // Limpa qualquer marcador existente
+  vectorSource.addFeature(marker); // Adiciona o novo marcador
+
+  // Atualiza a última coordenada clicada
+  lastClickedCoordinate = coordinate;
+}
+
+// Evento de clique no mapa
+map.on('click', function (event) {
   const coordinate = event.coordinate; // Coordenadas em EPSG:3857
   const lonLat = toLonLat(coordinate); // Converte para EPSG:4326 (longitude, latitude)
   const latitude = lonLat[1].toFixed(5); // Latitude com 5 casas decimais
   const longitude = lonLat[0].toFixed(5); // Longitude com 5 casas decimais
+
+  // Adiciona o ícone no local clicado
+  addMarker(coordinate);
 
   // Atualiza o texto das coordenadas
   document.getElementById('coordinates').innerText = `Latitude: ${latitude}, Longitude: ${longitude}`;
@@ -85,10 +102,10 @@ async function searchLocation(query) {
       document.getElementById('lat-value').innerText = result.lat;
       document.getElementById('lon-value').innerText = result.lon;
     } else {
-      console.log('Location not found');
+      console.log('Local não encontrado');
     }
   } catch (error) {
-    console.error('Error fetching location:', error);
+    console.error('Erro ao buscar a localização:', error);
   }
 }
 
@@ -106,25 +123,46 @@ document.getElementById('search').addEventListener('input', function() {
   }, 500); // Espera 500 ms após a última entrada antes de buscar
 });
 
-// Atualiza as coordenadas dos controles deslizantes
-document.getElementById('lat-range').addEventListener('input', function() {
-  const lat = this.value;
-  document.getElementById('lat-value').innerText = lat;
-  const lon = document.getElementById('lon-range').value;
-  const coordinate = fromLonLat([lon, lat]);
-  map.getView().animate({
-    center: coordinate,
-    duration: 500
-  });
-});
+// Função para buscar o nome do local a partir da coordenada (geocodificação reversa)
+async function reverseGeocode(coordinate) {
+  const lonLat = toLonLat(coordinate);
+  const lat = lonLat[1];
+  const lon = lonLat[0];
 
-document.getElementById('lon-range').addEventListener('input', function() {
-  const lon = this.value;
-  document.getElementById('lon-value').innerText = lon;
-  const lat = document.getElementById('lat-range').value;
-  const coordinate = fromLonLat([lon, lat]);
-  map.getView().animate({
-    center: coordinate,
-    duration: 500
-  });
-});
+  try {
+    const response = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`);
+    const data = await response.json();
+    return data.address; // Retorna o endereço completo
+  } catch (error) {
+    console.error('Erro ao obter o endereço:', error);
+    return null;
+  }
+}
+
+// Função para salvar a localização atual
+async function saveLocation() {
+  if (lastClickedCoordinate) {
+    const address = await reverseGeocode(lastClickedCoordinate);
+
+    if (address) {
+      const street = address.road || 'Rua não identificada';
+      const suburb = address.suburb || 'Bairro não identificado';
+      const city = address.city || address.town || 'Cidade não identificada';
+      const place = address.display_name || 'Local não identificado';
+
+      // Adiciona um card com a localização salva na div sugestao
+      const suggestionDiv = document.querySelector('.sugestao');
+      const newCard = document.createElement('div');
+      newCard.className = 'card';
+      newCard.innerText = `Local salvo: ${street}, ${suburb}, ${city} (${place})`;
+      suggestionDiv.appendChild(newCard);
+    } else {
+      alert('Endereço não encontrado para essa localização.');
+    }
+  } else {
+    alert("Clique no mapa para selecionar uma localização primeiro.");
+  }
+}
+
+// Adiciona o evento de clique ao botão para salvar a localização
+document.getElementById('save-btn').addEventListener('click', saveLocation);

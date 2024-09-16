@@ -18,10 +18,12 @@ body {
 }
 
 .sugestao {
+  position: relative;
+  bottom: 150px;
   border-radius: 10px;
   border: 5px solid pink; 
   width: 200px;
-  height: 450px;
+  height: 430px;
   margin-top: 5px;
   margin-right: 15px;
   display: flex;
@@ -32,6 +34,8 @@ body {
 }
 
 #map {
+  position: relative;
+  bottom: 150px;
   border-radius: 10px;
   border: 5px solid pink; 
   width: 850px;
